@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BombaHost | استضافة الملفات</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Courier New', monospace;
+        }
+        
+        body {
+            background-color: #000;
+            color: #ff4500;
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        /* Matrix background effect */
+        .matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+            opacity: 0.4;
+        }
+        
+        .matrix-code {
+            position: absolute;
+            top: 0;
+            left: 0;
+            color: rgba(255, 69, 0, 0.7);
+            font-size: 18px;
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            white-space: nowrap;
+            user-select: none;
+            animation: fall linear infinite;
+        }
+        
+        @keyframes fall {
+            to {
+                transform: translateY(100vh);
+            }
+        }
+        
+        /* Splash screen */
+        #splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            animation: fadeOut 3s forwards;
+        }
+        
+        @keyframes fadeOut {
+            0% { opacity: 1; }
+            70% { opacity: 1; }
+            100% { opacity: 0; visibility: hidden; }
+        }
+        
+        .splash-text {
+            font-size: 5rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            color: #ff4500;
+            text-shadow: 0 0 10px #ff4500, 0 0 20px #ff4500;
+            animation: explode 1s infinite;
+        }
+        
+        @keyframes explode {
+            0%, 100% { 
+                transform: scale(1);
+                text-shadow: 0 0 10px #ff4500, 0 0 20px #ff4500;
+            }
+            50% { 
+                transform: scale(1.1);
+                text-shadow: 0 0 20px #ff4500, 0 0 40px #ff4500, 0 0 60px #ff4500;
+            }
+        }
+        
+        /* Main container */
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Header styles */
+        header {
+            text-align: center;
+            padding: 30px 0;
+            border-bottom: 1px solid #ff4500;
+            margin-bottom: 40px;
+            position: relative;
+        }
+        
+        .logo {
+            font-size: 3.8rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            text-shadow: 0 0 15px #ff4500;
+            color: #ff4500;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { text-shadow: 0 0 10px #ff4500; }
+            50% { text-shadow: 0 0 25px #ff4500, 0 0 35px #ff4500; }
+            100% { text-shadow: 0 0 10px #ff4500; }
+        }
+        
+        .logo span {
+            color: #ffcc00;
+        }
+        
+        .subtitle {
+            font-size: 1.3rem;
+            color: #ffcc00;
+            margin-bottom: 20px;
+            text-shadow: 0 0 5px #ffcc00;
+        }
+        
+        /* Upload section */
+        .upload-section {
+            background: rgba(20, 0, 0, 0.6);
+            border: 2px solid #ff4500;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 50px;
+            box-shadow: 0 0 25px rgba(255, 69, 0, 0.5);
+        }
+        
+        .upload-label {
+            display: block;
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+            color: #ffcc00;
+            text-shadow: 0 0 5px #ffcc00;
+        }
+        
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+        
+        .file-input-wrapper input[type="file"] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            cursor: pointer;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .custom-file-btn {
+            background: #4b1a00;
+            color: #ffcc00;
+            border: 2px solid #ff4500;
+            padding: 15px 40px;
+            font-size: 1.5rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 0 10px rgba(255, 69, 0, 0.5);
+        }
+        
+        .custom-file-btn:hover {
+            background: #6d2700;
+            box-shadow: 0 0 20px #ff4500;
+            transform: translateY(-3px);
+        }
+        
+        .file-info {
+            font-size: 1.2rem;
+            margin-top: 20px;
+            color: #ffcc00;
+        }
+        
+        .upload-btn {
+            background: linear-gradient(to bottom, #ff4500, #cc3600);
+            color: #fff;
+            border: 2px solid #ff4500;
+            padding: 16px 60px;
+            font-size: 1.6rem;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            box-shadow: 0 0 15px rgba(255, 69, 0, 0.7);
+        }
+        
+        .upload-btn:hover {
+            background: linear-gradient(to bottom, #ff5500, #e04000);
+            box-shadow: 0 0 30px #ff4500;
+            transform: translateY(-5px);
+        }
+        
+        .upload-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        /* Files preview */
+        .files-preview {
+            max-height: 300px;
+            overflow-y: auto;
+            margin: 20px 0;
+            border: 1px solid #ff4500;
+            border-radius: 8px;
+            padding: 15px;
+            background: rgba(30, 0, 0, 0.4);
+        }
+        
+        .preview-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #4d1a00;
+        }
+        
+        .preview-item:last-child {
+            border-bottom: none;
+        }
+        
+        .preview-name {
+            flex: 1;
+            color: #ffcc00;
+            word-break: break-all;
+        }
+        
+        .preview-size {
+            color: #ff4500;
+            min-width: 100px;
+            text-align: left;
+            font-weight: bold;
+        }
+        
+        /* Uploaded files section */
+        .files-section {
+            background: rgba(20, 0, 0, 0.6);
+            border: 2px solid #ff4500;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 0 25px rgba(255, 69, 0, 0.5);
+        }
+        
+        .section-title {
+            font-size: 2rem;
+            text-align: center;
+            margin-bottom: 30px;
+            color: #ffcc00;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-bottom: 1px solid #ff4500;
+            padding-bottom: 15px;
+            text-shadow: 0 0 5px #ffcc00;
+        }
+        
+        .file-list {
+            list-style: none;
+        }
+        
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #4d1a00;
+            transition: all 0.3s;
+        }
+        
+        .file-item:hover {
+            background: rgba(40, 0, 0, 0.7);
+        }
+        
+        .file-name {
+            flex: 1;
+            font-size: 1.2rem;
+            color: #ffcc00;
+            word-break: break-all;
+            padding-right: 20px;
+        }
+        
+        .file-size {
+            color: #ff4500;
+            font-size: 1.1rem;
+            min-width: 100px;
+            text-align: left;
+            font-weight: bold;
+        }
+        
+        .file-link {
+            background: #4b1a00;
+            color: #ffcc00;
+            text-decoration: none;
+            margin-left: 20px;
+            padding: 8px 15px;
+            border-radius: 5px;
+            transition: all 0.3s;
+            border: 1px solid #ff4500;
+        }
+        
+        .file-link:hover {
+            background: #6d2700;
+            box-shadow: 0 0 10px #ff4500;
+            color: #fff;
+        }
+        
+        .empty-files {
+            text-align: center;
+            font-size: 1.3rem;
+            color: #ff4500;
+            padding: 30px;
+        }
+        
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 30px 0;
+            margin-top: 50px;
+            border-top: 1px solid #ff4500;
+            font-size: 1.1rem;
+            color: #ffcc00;
+        }
+        
+        .footer-links a {
+            color: #ffcc00;
+            margin: 0 15px;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        
+        .footer-links a:hover {
+            color: #ff4500;
+            text-shadow: 0 0 10px #ff4500;
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .logo {
+                font-size: 2.5rem;
+            }
+            
+            .upload-section {
+                padding: 20px;
+            }
+            
+            .upload-label {
+                font-size: 1.4rem;
+            }
+            
+            .file-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .file-size {
+                margin-top: 10px;
+            }
+            
+            .file-link {
+                margin: 10px 0 0;
+                display: block;
+            }
+        }
+        
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 5px;
+            font-size: 1.2rem;
+            z-index: 1000;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            animation: slideIn 0.5s, fadeOut 0.5s 4.5s forwards;
+            border: 1px solid;
+        }
+        
+        .success {
+            background-color: #4b1a00;
+            color: #ffcc00;
+            border-color: #ff4500;
+        }
+        
+        .error {
+            background-color: #330000;
+            color: #ff4500;
+            border-color: #ff0000;
+        }
+        
+        @keyframes slideIn {
+            from { right: -400px; opacity: 0; }
+            to { right: 20px; opacity: 1; }
+        }
+        
+        /* Explosions effect */
+        .explosion {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #ff5500, #ff0000);
+            box-shadow: 0 0 20px #ff4500;
+            animation: explodeAnim 0.8s forwards;
+            z-index: 10;
+        }
+        
+        @keyframes explodeAnim {
+            0% { transform: scale(0); opacity: 1; }
+            100% { transform: scale(5); opacity: 0; }
+        }
+        
+        /* Progress bar */
+        .progress-container {
+            width: 100%;
+            height: 20px;
+            background: #001a00;
+            border: 1px solid #ff4500;
+            border-radius: 10px;
+            margin: 30px 0;
+            overflow: hidden;
+            display: none;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #ff4500, #ffcc00);
+            border-radius: 10px;
+            transition: width 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <!-- Matrix background effect -->
+    <div class="matrix-bg" id="matrix-bg"></div>
+    
+    <!-- Splash screen -->
+    <div id="splash-screen">
+        <div class="splash-text">BOMBA HOST</div>
+    </div>
+    
+    <div class="container">
+        <header>
+            <div class="logo">BOMBA<span>HOST</span></div>
+            <div class="subtitle">استضافة الملفات التفجيرية مع رفع متعدد للملفات</div>
+        </header>
+        
+        <main>
+            <form id="uploadForm" method="POST" enctype="multipart/form-data">
+                <section class="upload-section">
+                    <h2 class="upload-label"><i class="fas fa-bomb"></i> رفع عدة ملفات حتى 100MB</h2>
+                    
+                    <div class="file-input-wrapper">
+                        <input type="file" id="fileInput" name="filesToUpload[]" multiple>
+                        <button type="button" class="custom-file-btn"><i class="fas fa-file-circle-plus"></i> اختر ملفات للرفع</button>
+                    </div>
+                    
+                    <div class="file-info" id="fileInfo">لم يتم اختيار أي ملفات</div>
+                    
+                    <!-- Files preview container -->
+                    <div class="files-preview" id="filesPreview"></div>
+                    
+                    <!-- Progress bar -->
+                    <div class="progress-container" id="progressContainer">
+                        <div class="progress-bar" id="progressBar"></div>
+                    </div>
+                    
+                    <button type="submit" class="upload-btn" id="uploadBtn" disabled><i class="fas fa-burst"></i> تفجير الملفات للخادم</button>
+                </section>
+            </form>
+            
+            <section class="files-section">
+                <h2 class="section-title"><i class="fas fa-fire"></i> الملفات المتفجرة</h2>
+                
+                <ul class="file-list" id="fileList">
+                    <?php if (count($existingFiles) > 0): ?>
+                        <?php foreach ($existingFiles as $file): ?>
+                            <li class="file-item">
+                                <div class="file-name"><?= htmlspecialchars($file['name']) ?></div>
+                                <div class="file-size"><?= formatFileSize($file['size']) ?></div>
+                                <a href="<?= htmlspecialchars($file['url']) ?>" class="file-link" download><i class="fas fa-burst"></i> تفجير</a>
+                            </li>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <div class="empty-files"><i class="fas fa-fire"></i> لا توجد ملفات متفجرة بعد</div>
+                    <?php endif; ?>
+                </ul>
+            </section>
+        </main>
+        
+        <footer>
+            <div class="footer-links">
+                <a href="#"><i class="fas fa-shield-alt"></i> سياسة الخصوصية</a>
+                <a href="#"><i class="fas fa-file-contract"></i> شروط الاستخدام</a>
+                <a href="#"><i class="fas fa-envelope"></i> اتصل بنا</a>
+            </div>
+            <p style="margin-top: 20px;">جميع الحقوق محفوظة &copy; 2023 - BombaHost</p>
+            <p>الحد الأقصى لحجم الملف: <strong>100 ميجابايت</strong></p>
+        </footer>
+    </div>
+
+    <script>
+        // إنشاء تأثير الماتريكس في الخلفية
+        function createMatrixEffect() {
+            const container = document.getElementById('matrix-bg');
+            container.innerHTML = '';
+            const characters = '01010101010101010101010101';
+            const fontSize = 18;
+            const columns = Math.floor(window.innerWidth / fontSize);
+            
+            for (let i = 0; i < columns; i++) {
+                const code = document.createElement('div');
+                code.className = 'matrix-code';
+                code.style.left = i * fontSize + 'px';
+                code.style.animationDuration = (Math.random() * 5 + 5) + 's';
+                code.style.animationDelay = Math.random() * 5 + 's';
+                code.textContent = characters;
+                container.appendChild(code);
+            }
+        }
+        
+        // إنشاء تأثيرات تفجيرية
+        function createExplosion(x, y) {
+            const explosion = document.createElement('div');
+            explosion.className = 'explosion';
+            explosion.style.left = x + 'px';
+            explosion.style.top = y + 'px';
+            document.body.appendChild(explosion);
+            
+            setTimeout(() => {
+                explosion.remove();
+            }, 800);
+        }
+        
+        // تحديث حجم تأثير الماتريكس عند تغيير حجم النافذة
+        window.addEventListener('resize', createMatrixEffect);
+        
+        // إخفاء شاشة الترحيب بعد 3 ثوانٍ
+        setTimeout(() => {
+            document.getElementById('splash-screen').style.animation = 'fadeOut 1s forwards';
+        }, 3000);
+        
+        // تنسيق حجم الملف
+        function formatFileSize(bytes) {
+            if (bytes >= 104857600) { // 100MB
+                return (bytes / 1048576).toFixed(1) + ' MB';
+            } else if (bytes >= 1024) {
+                return (bytes / 1024).toFixed(1) + ' KB';
+            } else {
+                return bytes + ' بايت';
+            }
+        }
+        
+        // عرض الإشعارات
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `<i class="fas ${type === 'success' ? 'fa-bomb' : 'fa-circle-exclamation'}"></i> ${message}`;
+            document.body.appendChild(notification);
+            
+            // إضافة تأثير تفجيري
+            createExplosion(
+                window.innerWidth - 100,
+                50
+            );
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 5000);
+        }
+        
+        // عرض معاينة الملفات المختارة
+        function displayFilesPreview(files) {
+            const previewContainer = document.getElementById('filesPreview');
+            previewContainer.innerHTML = '';
+            
+            if (files.length === 0) {
+                previewContainer.innerHTML = '<p style="text-align:center;color:#ffcc00;">لم يتم اختيار ملفات</p>';
+                return;
+            }
+            
+            let totalSize = 0;
+            
+            files.forEach(file => {
+                const fileElement = document.createElement('div');
+                fileElement.className = 'preview-item';
+                
+                const fileName = document.createElement('div');
+                fileName.className = 'preview-name';
+                fileName.textContent = file.name;
+                
+                const fileSize = document.createElement('div');
+                fileSize.className = 'preview-size';
+                fileSize.textContent = formatFileSize(file.size);
+                
+                fileElement.appendChild(fileName);
+                fileElement.appendChild(fileSize);
+                previewContainer.appendChild(fileElement);
+                
+                totalSize += file.size;
+            });
+            
+            // عرض الحجم الإجمالي
+            const totalElement = document.createElement('div');
+            totalElement.className = 'preview-item';
+            totalElement.style.borderTop = '1px solid #ff4500';
+            totalElement.style.marginTop = '10px';
+            totalElement.style.paddingTop = '10px';
+            
+            const totalLabel = document.createElement('div');
+            totalLabel.className = 'preview-name';
+            totalLabel.textContent = 'الحجم الإجمالي:';
+            totalLabel.style.fontWeight = 'bold';
+            totalLabel.style.color = '#ffcc00';
+            
+            const totalSizeElement = document.createElement('div');
+            totalSizeElement.className = 'preview-size';
+            totalSizeElement.textContent = formatFileSize(totalSize);
+            totalSizeElement.style.fontWeight = 'bold';
+            totalSizeElement.style.color = '#ff4500';
+            
+            totalElement.appendChild(totalLabel);
+            totalElement.appendChild(totalSizeElement);
+            previewContainer.appendChild(totalElement);
+        }
+        
+        // معالجة اختيار الملفات
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const files = Array.from(e.target.files);
+            const fileInfo = document.getElementById('fileInfo');
+            const uploadBtn = document.getElementById('uploadBtn');
+            
+            if (files.length > 0) {
+                fileInfo.innerHTML = `<i class="fas fa-bomb"></i> تم اختيار ${files.length} قنابل رقمية`;
+                uploadBtn.disabled = false;
+                displayFilesPreview(files);
+                
+                // إضافة تأثيرات تفجيرية عند اختيار الملفات
+                for (let i = 0; i < 3; i++) {
+                    setTimeout(() => {
+                        createExplosion(
+                            Math.random() * window.innerWidth,
+                            Math.random() * 300 + 100
+                        );
+                    }, i * 200);
+                }
+            } else {
+                fileInfo.textContent = 'لم يتم اختيار أي ملفات';
+                uploadBtn.disabled = true;
+                document.getElementById('filesPreview').innerHTML = '';
+            }
+        });
+        
+        // معالجة رفع الملفات
+        document.getElementById('uploadForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const fileInput = document.getElementById('fileInput');
+            const uploadBtn = document.getElementById('uploadBtn');
+            const progressContainer = document.getElementById('progressContainer');
+            const progressBar = document.getElementById('progressBar');
+            
+            if (!fileInput.files || fileInput.files.length === 0) {
+                showNotification('لم تختر أي ملفات للتفجير!', 'error');
+                return;
+            }
+            
+            // تعطيل زر الرفع أثناء العملية
+            uploadBtn.disabled = true;
+            uploadBtn.innerHTML = '<i class="fas fa-burst"></i> جاري التفجير...';
+            progressContainer.style.display = 'block';
+            
+            // إرسال النموذج
+            const formData = new FormData(this);
+            
+            // إظهار شريط التقدم
+            progressBar.style.width = '30%';
+            
+            // إرسال البيانات إلى الخادم
+            fetch('', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(data => {
+                // عند اكتمال الرفع
+                progressBar.style.width = '100%';
+                
+                setTimeout(() => {
+                    // عرض إشعار النجاح
+                    showNotification(`تم تفجير ${fileInput.files.length} ملفات بنجاح!`, 'success');
+                    
+                    // إنشاء تأثيرات تفجيرية
+                    for (let i = 0; i < 5; i++) {
+                        setTimeout(() => {
+                            createExplosion(
+                                Math.random() * window.innerWidth,
+                                Math.random() * window.innerHeight
+                            );
+                        }, i * 300);
+                    }
+                    
+                    // إعادة تحميل الصفحة لعرض الملفات الجديدة
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1500);
+                }, 500);
+            })
+            .catch(error => {
+                showNotification('حدث خطأ أثناء التفجير!', 'error');
+                console.error('Upload error:', error);
+            })
+            .finally(() => {
+                // إعادة تمكين زر الرفع
+                setTimeout(() => {
+                    uploadBtn.disabled = false;
+                    uploadBtn.innerHTML = '<i class="fas fa-burst"></i> تفجير الملفات للخادم';
+                    progressContainer.style.display = 'none';
+                    progressBar.style.width = '0%';
+                }, 2000);
+            });
+        });
+        
+        // تهيئة التأثيرات عند تحميل الصفحة
+        window.addEventListener('DOMContentLoaded', () => {
+            createMatrixEffect();
+            
+            // عرض رسالة ترحيبية
+            setTimeout(() => {
+                showNotification('مرحباً بك في BombaHost! جاهز للتفجير؟', 'success');
+            }, 3500);
+            
+            // إظهار الملفات المرفوعة مسبقاً
+            <?php if (count($uploadedFiles) > 0): ?>
+                showNotification(`تم رفع <?= count($uploadedFiles) ?> ملفات بنجاح!`, 'success');
+                
+                // إنشاء تأثيرات تفجيرية
+                for (let i = 0; i < 5; i++) {
+                    setTimeout(() => {
+                        createExplosion(
+                            Math.random() * window.innerWidth,
+                            Math.random() * window.innerHeight
+                        );
+                    }, i * 300);
+                }
+            <?php endif; ?>
+        });
+    </script>
+</body>
+</html>
